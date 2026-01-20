@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Добавить зону</h2>
+<form method="post">
+    <label>Название*:
+        <input type="text" name="name" required>
+    </label>
+    <label>Склад*:
+        <select name="warehouse_id" required>
+            <option value="">— Выберите —</option>
+            {% for w in warehouses %}
+                <option value="{{ w[0] }}">{{ w[1] }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Тип*:
+        <select name="type" required>
+            <option value="">— Выберите —</option>
+            <option value="receiving">Приёмка</option>
+            <option value="storage">Хранение</option>
+            <option value="picking">Комплектация</option>
+            <option value="shipping">Отгрузка</option>
+        </select>
+    </label>
+    <label>Макс. ёмкость:
+        <input type="number" step="0.01" name="max_capacity">
+    </label>
+    <button type="submit">Сохранить</button>
+    <a href="{{ url_for('zone_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Справочник ресурсов</h2>
+<a href="{{ url_for('resource_create') }}" class="btn">+ Добавить ресурс</a>
+<table border="1" style="width:100%; margin-top:15px;">
+    <thead><tr><th>Название</th><th>Тип</th><th>Подтип</th><th>Зона</th><th>Действия</th></tr></thead>
+    <tbody>
+        {% for r in resources %}
+        <tr>
+            <td>{{ r[1] }}</td>
+            <td>{{ r[2] }}</td>
+            <td>{{ r[3] }}</td>
+            <td>{{ r[4] or '—' }}</td>
+            <td>
+                <a href="{{ url_for('resource_edit', id=r[0]) }}">✏️</a>
+                <a href="{{ url_for('resource_delete', id=r[0]) }}" style="color:red;">🗑️</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">Нет ресурсов</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

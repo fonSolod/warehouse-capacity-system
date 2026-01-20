@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Удалить ресурс?</h2>
+<p>Вы уверены, что хотите удалить ресурс <strong>{{ name }}</strong>?</p>
+<form method="post">
+    <button type="submit" style="background:red;">Да, удалить</button>
+    <a href="{{ url_for('resource_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

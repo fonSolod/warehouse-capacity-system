@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Список товаров{% endblock %}
+{% block content %}
+<h2>Товары (SKU)</h2>
+<a href="{{ url_for('product_create') }}" class="btn">+ Добавить товар</a>
+<table border="1" style="width:100%; margin-top:15px;">
+    <thead>
+        <tr>
+            <th>Клиент</th><th>Название</th><th>Вес/шт, кг</th>
+            <th>Шт/кор</th><th>Шт/пал</th><th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in products %}
+        <tr>
+            <td>{{ p[2] }}</td>
+            <td>{{ p[1] }}</td>
+            <td>{{ p[3] }}</td>
+            <td>{{ p[4] }}</td>
+            <td>{{ p[5] }}</td>
+            <td>
+                <a href="{{ url_for('product_edit', id=p[0]) }}">✏️</a>
+                <a href="{{ url_for('product_delete', id=p[0]) }}" style="color:red;">🗑️</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">Нет товаров</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Баланс мощностей{% endblock %}
+{% block content %}
+<h2>Баланс мощностей</h2>
+<p>Сопоставление потребности и доступности ресурсов</p>
+
+<!-- Фильтр по дате -->
+<form method="get" style="margin-bottom:20px;">
+    <label>
+        С даты:
+        <input type="date" name="start_date" value="{{ start_date or '' }}">
+    </label>
+    <label>
+        По дату:
+        <input type="date" name="end_date" value="{{ end_date or '' }}">
+    </label>
+    <button type="submit">Применить фильтр</button>
+    <a href="{{ url_for('balance_view') }}" class="btn">Сбросить</a>
+</form>
+
+{% if balance_data %}
+<table border="1" style="width:100%; margin-top:15px; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Зона</th>
+            <th>Ресурс</th>
+            <th>Требуемо, ч</th>
+            <th>Доступно, ч</th>
+            <th>Баланс, ч</th>
+            <th>Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in balance_data %}
+        <tr style="background-color: {% if row[5] < 0 %}#ffebee{% elif row[5] > 0 %}#e8f5e8{% else %}#fff3e0{% endif %};">
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>
+                {% if row[5] < 0 %}
+                    <span style="color:red;">⚠️ Дефицит</span>
+                {% elif row[5] > 0 %}
+                    <span style="color:green;">✅ Избыток</span>
+                {% else %}
+                    <span>— В балансе</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Нет данных для расчёта баланса. Убедитесь, что:</p>
+<ul>
+    <li>Есть валидированные поступления,</li>
+    <li>Заполнены нормативы,</li>
+    <li>Указаны доступные мощности.</li>
+</ul>
+{% endif %}
+
+<p><a href="{{ url_for('index') }}" class="btn">← Назад</a></p>
+{% endblock %}

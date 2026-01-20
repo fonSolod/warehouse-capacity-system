@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Нормативы обработки</h2>
+<a href="{{ url_for('norm_create') }}" class="btn">+ Добавить норматив</a>
+<table border="1" style="width:100%; margin-top:15px;">
+    <thead>
+        <tr>
+            <th>Клиент</th><th>Товар</th><th>Операция</th><th>Зона</th>
+            <th>Ресурс</th><th>Ед.изм.</th><th>Норма</th><th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for n in norms %}
+        <tr>
+            <td>{{ n[1] }}</td><td>{{ n[2] }}</td><td>{{ n[3] }}</td><td>{{ n[4] }}</td>
+            <td>{{ n[5] }}</td><td>{{ n[6] }}</td><td>{{ n[7] }}</td>
+            <td>
+                <a href="{{ url_for('norm_edit', id=n[0]) }}">✏️</a>
+                <a href="{{ url_for('norm_delete', id=n[0]) }}" style="color:red;">🗑️</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8">Нет нормативов</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

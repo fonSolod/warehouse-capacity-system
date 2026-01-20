@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Подтвердить поступление{% endblock %}
+{% block content %}
+<h2>Подтвердить приём плана (A1.3)</h2>
+<p>Клиент: <strong>{{ client_name }}</strong></p>
+<p>Документ: <strong>{{ doc_number }}</strong></p>
+<p>Подтверждение означает, что план принят к исполнению и будет участвовать в расчётах.</p>
+
+<form method="post">
+    <button type="submit" style="background:green; color:white;">✅ Подтвердить приём</button>
+    <a href="{{ url_for('inbound_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; }
+        .period { text-align: center; margin-bottom: 20px; }
+        .rec { margin-bottom: 15px; padding: 10px; border-left: 3px solid #000; }
+        .deficit { border-left-color: red; }
+        .surplus { border-left-color: green; }
+    </style>
+</head>
+<body>
+    <h1>Рекомендации по корректировке ресурсов</h1>
+    <div class="period">
+        Период: с {{ start_date or 'начала' }} по {{ end_date or 'конец' }}
+    </div>
+    {% for rec in recommendations %}
+    <div class="rec {{ 'deficit' if rec.type == 'Дефицит' else 'surplus' }}">
+        <strong>{{ rec.date }} | {{ rec.zone }} | {{ rec.resource }}</strong><br>
+        Баланс: {{ rec.balance }} ч → {{ rec.type }}<br>
+        Рекомендация: {{ rec.recommendation }}
+    </div>
+    {% else %}
+    <p>Нет рекомендаций.</p>
+    {% endfor %}
+</body>
+</html>

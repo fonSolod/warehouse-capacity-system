@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Рекомендации по корректировке{% endblock %}
+{% block content %}
+<h2>Рекомендации по корректировке ресурсов</h2>
+
+<!-- Форма фильтра и экспорта -->
+<form method="post" style="margin-bottom: 20px;">
+    <label>
+        С даты:
+        <input type="date" name="start_date" value="{{ request.form.get('start_date') or start_date or '' }}">
+    </label>
+    <label>
+        По дату:
+        <input type="date" name="end_date" value="{{ request.form.get('end_date') or end_date or '' }}">
+    </label>
+    <br><br>
+    <button type="submit" name="action" value="pdf">Сохранить в PDF</button>
+    <button type="submit" name="action" value="csv">Сохранить в CSV</button>
+</form>
+
+<!-- Отображение рекомендаций -->
+{% if recommendations %}
+<div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+    <h3>Результаты:</h3>
+    {% for rec in recommendations %}
+    <div style="border-left: 4px solid {% if rec.type == 'Дефицит' %}red{% else %}green{% endif %}; 
+                padding: 12px; background: {% if rec.type == 'Дефицит' %}#ffebee{% else %}#e8f5e8{% endif %}; 
+                border-radius: 4px;">
+        <strong>{{ rec.date }} | {{ rec.zone }} | {{ rec.resource }}</strong><br>
+        Баланс: <strong>{{ rec.balance }} ч</strong> → {{ rec.type }}<br>
+        <em>Рекомендация:</em> {{ rec.recommendation }}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Нет рекомендаций за указанный период.</p>
+{% endif %}
+
+<p><a href="{{ url_for('index') }}" class="btn">← Назад</a></p>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Добавить склад</h2>
+<form method="post">
+    <label>Название*:
+        <input type="text" name="name" required>
+    </label>
+    <label>Адрес:
+        <input type="text" name="address">
+    </label>
+    <label>Ёмкость, м³:
+        <input type="number" step="0.01" name="capacity_m3">
+    </label>
+    <button type="submit">Сохранить</button>
+    <a href="{{ url_for('warehouse_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

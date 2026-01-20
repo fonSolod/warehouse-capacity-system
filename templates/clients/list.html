@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Список клиентов{% endblock %}
+{% block content %}
+<h2>Клиенты</h2>
+<a href="{{ url_for('client_create') }}" class="btn">+ Добавить клиента</a>
+<table border="1" style="width:100%; margin-top:15px;">
+    <thead>
+        <tr><th>Название</th><th>Контакт</th><th>Действия</th></tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client[1] }}</td>
+            <td>{{ client[2] or '—' }}</td>
+            <td>
+                <a href="{{ url_for('client_edit', id=client[0]) }}">✏️</a>
+                <a href="{{ url_for('client_delete', id=client[0]) }}" style="color:red;">🗑️</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3">Нет клиентов</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

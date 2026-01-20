@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Доступные мощности</h2>
+<a href="{{ url_for('capacity_create') }}" class="btn">+ Добавить запись</a>
+<table border="1" style="width:100%; margin-top:15px;">
+    <thead>
+        <tr>
+            <th>Ресурс</th><th>Подтип</th><th>Дата</th><th>Доступно, ч</th><th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in capacities %}
+        <tr>
+            <td>{{ c[1] }}</td>
+            <td>{{ c[2] }}</td>
+            <td>{{ c[3] }}</td>
+            <td>{{ c[4] }}</td>
+            <td>
+                <a href="{{ url_for('capacity_edit', id=c[0]) }}">✏️</a>
+                <a href="{{ url_for('capacity_delete', id=c[0]) }}" style="color:red;">🗑️</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">Нет данных</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

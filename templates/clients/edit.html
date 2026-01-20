@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Редактировать клиента{% endblock %}
+{% block content %}
+<h2>Редактировать клиента</h2>
+<form method="post">
+    <label>Название клиента*:
+        <input type="text" name="name" value="{{ client[1] }}" required>
+    </label>
+    <label>Контактное лицо:
+        <input type="text" name="contact_person" value="{{ client[2] or '' }}">
+    </label>
+    <button type="submit">Сохранить</button>
+    <a href="{{ url_for('client_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

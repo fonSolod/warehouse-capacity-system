@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Потребность в ресурсах{% endblock %}
+{% block content %}
+<h2>Рассчитанная потребность в ресурсах</h2>
+
+<!-- Фильтр по дате -->
+<form method="get" style="margin-bottom:20px;">
+    <label>
+        С даты:
+        <input type="date" name="start_date" value="{{ start_date or '' }}">
+    </label>
+    <label>
+        По дату:
+        <input type="date" name="end_date" value="{{ end_date or '' }}">
+    </label>
+    <button type="submit">Применить фильтр</button>
+    <a href="{{ url_for('requirements_view') }}" class="btn">Сбросить</a>
+</form>
+
+{% if requirements %}
+<table border="1" style="width:100%; margin-top:15px;">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Номер поступления</th>
+            <th>Зона</th>
+            <th>Тип ресурса</th>
+            <th>Требуется (ед*час)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for req in requirements %}
+        <tr>
+            <td>{{ req[0] }}</td>
+            <td>{{ req[1] }}</td>
+            <td>{{ req[2] }}</td>
+            <td>{{ req[3] }}</td>
+            <td>{{ req[4] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Нет данных для расчёта. Убедитесь, что:</p>
+<ul>
+    <li>Добавлены валидированные поступления,</li>
+    <li>Заполнены нормативы для соответствующих клиентов и товаров.</li>
+</ul>
+{% endif %}
+
+<p><a href="{{ url_for('index') }}" class="btn">← Назад</a></p>
+{% endblock %}

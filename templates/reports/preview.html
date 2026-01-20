@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+        .period { text-align: center; margin-bottom: 20px; }
+        .actions { text-align: center; margin-top: 20px; }
+        .actions button { padding: 8px 16px; margin: 0 10px; }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <div class="period">
+        Период: с {{ start_date }} по {{ end_date }}
+    </div>
+    <table>
+        <thead>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr>
+                    {% for cell in row %}
+                        <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+            {% else %}
+                <tr><td colspan="{{ headers|length }}">Нет данных</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="actions">
+        <button onclick="window.print()">Печать</button>
+        <a href="{{ url_for('report_select') }}" class="btn">Назад</a>
+    </div>
+</body>
+</html>

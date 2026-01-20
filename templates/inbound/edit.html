@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Добавить поступление{% endblock %}
+{% block content %}
+<h2>Добавить поступление (A1.1)</h2>
+
+<form method="post" id="inboundForm">
+    <label>Клиент*:
+        <select name="client_id" required onchange="loadProducts(this.value)">
+            <option value="">— Выберите клиента —</option>
+            {% for c in clients %}
+                <option value="{{ c[0] }}">{{ c[1] }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Номер документа*:
+        <input type="text" name="doc_number" required placeholder="Например: НАК-2025-001">
+    </label>
+
+    <label>Дата документа*:
+        <input type="date" name="doc_date" required>
+    </label>
+
+    <h3>Позиции поступления</h3>
+    <div id="items">
+        <!-- Первая позиция -->
+        <div class="item-row" style="display:flex; gap:10px; margin-bottom:10px; align-items:end;">
+            <select name="sku_id" required style="flex:2;">
+                <option value="">— Сначала выберите клиента —</option>
+            </select>
+            <input type="number" step="0.001" name="qty" min="0.001" placeholder="Кол-во" required style="flex:1;">
+            <select name="unit_type" required style="flex:1;">
+                <option value="шт">шт</option>
+                <option value="коробка">коробка</option>
+                <option value="паллета">паллета</option>
+            </select>
+            <button type="button" onclick="removeItem(this)" style="padding:5px;">🗑️</button>
+        </div>
+    </div>
+
+    <button type="button" onclick="addItem()" style="margin:10px 0;">+ Добавить позицию</button>
+    <br>
+    <button type="submit">Сохранить поступление</button>
+    <a href="{{ url_for('inbound_list') }}" class="btn">Отмена</a>
+</form>
+
+<script>
+// Предзагружаем все товары (для курсового — достаточно)
+const allProducts = {{ products | tojson }};
+const clients = {{ clients | tojson }};
+
+function loadProducts(clientId) {
+    if (!clientId) {
+        // Если клиент не выбран — очищаем все списки товаров
+        document.querySelectorAll('#items select[name="sku_id"]').forEach(select => {
+            select.innerHTML = '<option value="">— Выберите клиента —</option>';
+        });
+        return;
+    }
+
+    // Фильтруем товары по выбранному клиенту
+    const filtered = allProducts.filter(p => p[1] == clientId); // p[1] = client_id в products
+
+    // Генерируем опции
+    let optionsHtml = '<option value="">— Выберите товар —</option>';
+    filtered.forEach(p => {
+        optionsHtml += `<option value="${p[0]}">${p[2]}</option>`; // p[0]=sku_id, p[2]=name
+    });
+
+    // Обновляем ВСЕ селекты товаров на странице
+    document.querySelectorAll('#items select[name="sku_id"]').forEach(select => {
+        select.innerHTML = optionsHtml;
+    });
+}
+
+function addItem() {
+    const itemsDiv = document.getElementById('items');
+    const newRow = document.createElement('div');
+    newRow.className = 'item-row';
+    newRow.style.display = 'flex';
+    newRow.style.gap = '10px';
+    newRow.style.marginBottom = '10px';
+    newRow.style.alignItems = 'end';
+
+    // Получаем текущий выбранный клиент
+    const clientId = document.querySelector('select[name="client_id"]').value;
+
+    // Формируем список товаров для нового клиента
+    let productOptions = '<option value="">— Выберите товар —</option>';
+    if (clientId) {
+        const filtered = allProducts.filter(p => p[1] == clientId);
+        filtered.forEach(p => {
+            productOptions += `<option value="${p[0]}">${p[2]}</option>`;
+        });
+    } else {
+        productOptions = '<option value="">— Сначала выберите клиента —</option>';
+    }
+
+    newRow.innerHTML = `
+        <select name="sku_id" required style="flex:2;">
+            ${productOptions}
+        </select>
+        <input type="number" step="0.001" name="qty" placeholder="Кол-во" required style="flex:1;">
+        <select name="unit_type" required style="flex:1;">
+            <option value="шт">шт</option>
+            <option value="коробка">коробка</option>
+            <option value="паллета">паллета</option>
+        </select>
+        <button type="button" onclick="removeItem(this)" style="padding:5px;">🗑️</button>
+    `;
+    itemsDiv.appendChild(newRow);
+}
+
+function removeItem(button) {
+    if (document.querySelectorAll('#items .item-row').length > 1) {
+        button.closest('.item-row').remove();
+    } else {
+        alert('Нельзя удалить последнюю позицию.');
+    }
+}
+
+// === Инициализация при загрузке страницы ===
+document.addEventListener('DOMContentLoaded', function () {
+    const clientSelect = document.querySelector('select[name="client_id"]');
+    if (clientSelect && clientSelect.value) {
+        // Если клиент уже выбран (например, при редактировании) — загрузить его товары
+        loadProducts(clientSelect.value);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Формирование отчётов{% endblock %}
+{% block content %}
+<h2>Формирование отчётов</h2>
+<form method="post" action="{{ url_for('generate_report') }}">
+    <label>
+        Тип отчёта*:
+        <select name="report_type" required>
+            <option value="">— Выберите —</option>
+            <option value="balance">Отчёт по балансу мощностей</option>
+            <option value="load">Отчёт нагрузка за период</option>
+            <option value="requirement">Отчёт потребность за период</option>
+            <option value="capacity">Отчёт доступность за период</option>
+        </select>
+    </label>
+    <label>
+        С даты*:
+        <input type="date" name="start_date" required>
+    </label>
+    <label>
+        По дату*:
+        <input type="date" name="end_date" required>
+    </label>
+    <div style="margin-top:15px;">
+        <button type="submit" name="action" value="preview">Предпросмотр</button>
+        <button type="submit" name="action" value="pdf">Сохранить в PDF</button>
+        <button type="submit" name="action" value="csv">Сохранить в CSV</button>
+    </div>
+</form>
+{% endblock %}

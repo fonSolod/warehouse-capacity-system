@@ -1,0 +1,47 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>✅ Информационная система оценки мощностей склада</h1>
+<h2>Выберите справочник для управления:</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+    <a href="{{ url_for('client_list') }}" class="btn">Клиенты</a>
+    <a href="{{ url_for('product_list') }}" class="btn">Товары (SKU)</a>
+    <a href="{{ url_for('warehouse_list') }}" class="btn">Склады</a>
+    <a href="{{ url_for('zone_list') }}" class="btn">Зоны склада</a>
+    <a href="{{ url_for('resource_list') }}" class="btn">Справочник ресурсов</a>
+	<a href="{{ url_for('norm_list') }}" class="btn">Нормативы</a>
+</div>
+
+<h2>Введите поступления и мощности:</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+    <a href="{{ url_for('inbound_list') }}" class="btn">Поступление</a>
+	<a href="{{ url_for('capacity_list') }}" class="btn">Мощности</a>	
+</div>
+
+
+<h2>Сформируйте баланс, отчёты и рекомендации:</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+    <a href="{{ url_for('balance_view') }}" class="btn">Баланс</a>
+	<a href="{{ url_for('report_select') }}" class="btn">Отчёты</a>	
+	<a href="{{ url_for('requirements_view') }}" class="btn">Потребность</a>
+	<a href="{{ url_for('recommendations_view') }}" class="btn">Рекомендации</a>	
+</div>
+
+
+
+
+<h2>Последние клиенты (до 5):</h2>
+<ul>
+    {% for client in clients %}
+        <li>{{ client[0] }}</li>
+    {% else %}
+        <li>Нет данных</li>
+    {% endfor %}
+</ul>
+
+<p><small>Подключено к PostgreSQL | Система готова к вводу планов и расчётам</small></p>
+{% endblock %}

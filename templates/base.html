@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Склад — Баланс мощностей{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav style="padding: 10px; background: #f0f0f0; margin-bottom: 20px;">
+        <a href="/">Главная</a> | 
+        <a href="{{ url_for('client_list') }}">Клиенты</a> |
+		<a href="{{ url_for('product_list') }}">Товары</a> |
+		<a href="{{ url_for('warehouse_list') }}">Склады</a> |
+		<a href="{{ url_for('zone_list') }}">Зоны</a> |
+		<a href="{{ url_for('resource_list') }}">Справочник ресурсов</a> |
+		<a href="{{ url_for('capacity_list') }}">Мощности</a> |
+		<a href="{{ url_for('norm_list') }}">Нормативы</a> |
+		<a href="{{ url_for('inbound_list') }}">Поступление</a> |
+		<a href="{{ url_for('outbound_list') }}">Отгрузка</a> |
+		<a href="{{ url_for('requirements_view') }}">Потребность</a> |
+		<a href="{{ url_for('balance_view') }}">Баланс</a> |
+		<a href="{{ url_for('report_select') }}">Отчёты</a> |
+		<a href="{{ url_for('recommendations_view') }}">Рекомендации</a>
+    </nav>
+    <div class="container" style="max-width: 800px; margin: 0 auto; padding: 0 15px;">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flash-messages" style="color: red; list-style: none; padding: 0;">
+                    {% for msg in messages %}
+                        <li>{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

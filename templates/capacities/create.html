@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Добавить доступность ресурса</h2>
+<form method="post">
+    <label>Ресурс*:
+        <select name="resource_id" required>
+            <option value="">— Выберите —</option>
+            {% for r in resources %}
+                <option value="{{ r[0] }}">{{ r[1] }} ({{ r[2] }})</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Дата*:
+        <input type="date" name="date" required>
+    </label>
+    <label>Доступно, часов*:
+        <input type="number" step="0.1" name="available_hours" min="0" required>
+    </label>
+    <button type="submit">Сохранить</button>
+    <a href="{{ url_for('capacity_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

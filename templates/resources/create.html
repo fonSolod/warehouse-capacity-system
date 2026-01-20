@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Добавить ресурс</h2>
+<form method="post">
+    <label>Название*:
+        <input type="text" name="name" required>
+    </label>
+
+    <label>Тип ресурса*:
+        <select name="type" required onchange="updateSubtypes(this.value)">
+            <option value="">— Выберите —</option>
+            <option value="staff">Персонал</option>
+            <option value="equipment">Техника</option>
+        </select>
+    </label>
+
+    <label>Подтип*:
+        <select name="subtype" required id="subtypeSelect">
+            <option value="">— Сначала выберите тип —</option>
+        </select>
+    </label>
+
+    <label>Зона (опционально):
+        <select name="zone_id">
+            <option value="">— Не привязана —</option>
+            {% for z in zones %}
+                <option value="{{ z[0] }}">{{ z[1] }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <button type="submit">Сохранить</button>
+    <a href="{{ url_for('resource_list') }}" class="btn">Отмена</a>
+</form>
+
+<script>
+function updateSubtypes(type) {
+    const select = document.getElementById('subtypeSelect');
+    select.innerHTML = '<option value="">— Выберите подтип —</option>';
+    if (type === 'staff') {
+        ['Приёмщик', 'Грузчик', 'Контролёр'].forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            select.appendChild(opt);
+        });
+    } else if (type === 'equipment') {
+        ['Ричтрак', 'Паллетоперевозчик', 'Тележка'].forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            select.appendChild(opt);
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Редактировать норматив{% endblock %}
+{% block content %}
+<h2>Редактировать норматив</h2>
+<form method="post">
+    <label>Клиент*:
+        <select name="client_id" required>
+            <option value="">— Выберите —</option>
+            {% for c in clients %}
+                <option value="{{ c[0] }}" {% if c[0] == norm[1] %}selected{% endif %}>{{ c[1] }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Товар*:
+        <select name="sku_id" required>
+            <option value="">— Выберите —</option>
+            {% for p in products %}
+                <option value="{{ p[0] }}" {% if p[0] == norm[2] %}selected{% endif %}>{{ p[1] }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Тип операции*:
+        <select name="operation_type" required>
+            <option value="">— Выберите —</option>
+            <option value="inbound" {% if norm[3] == 'inbound' %}selected{% endif %}>Поступление</option>
+            <option value="outbound" {% if norm[3] == 'outbound' %}selected{% endif %}>Отгрузка</option>
+        </select>
+    </label>
+
+    <label>Тип зоны*:
+        <select name="zone_type" required>
+            <option value="">— Выберите —</option>
+            <option value="receiving" {% if norm[4] == 'receiving' %}selected{% endif %}>Приёмка</option>
+            <option value="picking" {% if norm[4] == 'picking' %}selected{% endif %}>Комплектация</option>
+            <option value="shipping" {% if norm[4] == 'shipping' %}selected{% endif %}>Отгрузка</option>
+            <option value="storage" {% if norm[4] == 'storage' %}selected{% endif %}>Хранение</option>
+        </select>
+    </label>
+
+    <label>Подтип ресурса*:
+        <select name="resource_subtype" required>
+            <option value="">— Выберите —</option>
+            <option value="Приёмщик" {% if norm[5] == 'Приёмщик' %}selected{% endif %}>Приёмщик</option>
+            <option value="Грузчик" {% if norm[5] == 'Грузчик' %}selected{% endif %}>Грузчик</option>
+            <option value="Контролёр" {% if norm[5] == 'Контролёр' %}selected{% endif %}>Контролёр</option>
+            <option value="Ричтрак" {% if norm[5] == 'Ричтрак' %}selected{% endif %}>Ричтрак</option>
+            <option value="Паллетоперевозчик" {% if norm[5] == 'Паллетоперевозчик' %}selected{% endif %}>Паллетоперевозчик</option>
+            <option value="Тележка" {% if norm[5] == 'Тележка' %}selected{% endif %}>Тележка</option>
+        </select>
+    </label>
+
+    <label>Единица измерения*:
+        <select name="unit_type" required>
+            <option value="">— Выберите —</option>
+            <option value="шт" {% if norm[6] == 'шт' %}selected{% endif %}>шт</option>
+            <option value="коробка" {% if norm[6] == 'коробка' %}selected{% endif %}>коробка</option>
+            <option value="паллета" {% if norm[6] == 'паллета' %}selected{% endif %}>паллета</option>
+        </select>
+    </label>
+
+    <label>Норма (ед./час)*:
+        <input type="number" step="0.01" name="norm_value" value="{{ norm[7] }}" min="0.01" required>
+    </label>
+
+    <button type="submit">Сохранить</button>
+    <a href="{{ url_for('norm_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

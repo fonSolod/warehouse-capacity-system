@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Поступления{% endblock %}
+{% block content %}
+<h2>Поступления от клиентов</h2>
+<a href="{{ url_for('inbound_create') }}" class="btn">+ Добавить поступление</a>
+
+{% if docs %}
+<table border="1" style="width:100%; margin-top:15px; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Клиент</th>
+            <th>Номер документа</th>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for doc in docs %}
+        <tr>
+            <td>{{ doc[0] }}</td>
+            <td>{{ doc[1] }}</td>
+            <td>{{ doc[2] }}</td>
+            <td>{{ doc[3] }}</td>
+            <td>
+                {% if doc[4] %}
+                    <span style="color:green;">✅ Валидирован</span>
+                {% else %}
+                    <span style="color:orange;">⏳ Ожидает</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if not doc[4] %}
+                    <a href="{{ url_for('inbound_validate', doc_id=doc[0]) }}" style="color:green;">✅</a>
+                {% endif %}
+                <a href="{{ url_for('inbound_edit', doc_id=doc[0]) }}">✏️</a>
+                <a href="{{ url_for('inbound_delete', doc_id=doc[0]) }}" style="color:red;">🗑️</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Нет поступлений.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Зоны склада</h2>
+<a href="{{ url_for('zone_create') }}" class="btn">+ Добавить зону</a>
+<table border="1" style="width:100%; margin-top:15px;">
+    <thead><tr><th>ID</th><th>Название</th><th>Тип</th><th>Склад</th><th>Макс. ёмкость</th><th>Действия</th></tr></thead>
+    <tbody>
+        {% for z in zones %}
+        <tr>
+            <td>{{ z[0] }}</td>
+            <td>{{ z[1] }}</td>
+            <td>{{ z[2] }}</td>
+            <td>{{ z[3] }}</td>
+            <td>{{ z[4] or '—' }}</td>
+            <td>
+                <a href="{{ url_for('zone_edit', id=z[0]) }}">✏️</a>
+                <a href="{{ url_for('zone_delete', id=z[0]) }}" style="color:red;">🗑️</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">Нет зон</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

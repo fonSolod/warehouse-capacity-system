@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Удалить норматив?</h2>
+<p>Вы уверены, что хотите удалить норматив:<br><strong>{{ description }}</strong>?</p>
+<form method="post">
+    <button type="submit" style="background:red;">Да, удалить</button>
+    <a href="{{ url_for('norm_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}

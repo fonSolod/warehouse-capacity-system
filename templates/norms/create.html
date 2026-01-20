@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Добавить норматив{% endblock %}
+{% block content %}
+<h2>Добавить норматив</h2>
+<form method="post">
+    <label>Клиент*:
+        <select name="client_id" required>
+            <option value="">— Выберите —</option>
+            {% for c in clients %}
+                <option value="{{ c[0] }}">{{ c[1] }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Товар*:
+        <select name="sku_id" required>
+            <option value="">— Выберите —</option>
+            {% for p in products %}
+                <option value="{{ p[0] }}">{{ p[1] }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Тип операции*:
+        <select name="operation_type" required>
+            <option value="">— Выберите —</option>
+            <option value="inbound">Поступление</option>
+            <option value="outbound">Отгрузка</option>
+        </select>
+    </label>
+
+    <label>Тип зоны*:
+        <select name="zone_type" required>
+            <option value="">— Выберите —</option>
+            <option value="receiving">Приёмка</option>
+            <option value="picking">Комплектация</option>
+            <option value="shipping">Отгрузка</option>
+            <option value="storage">Хранение</option>
+        </select>
+    </label>
+
+    <label>Подтип ресурса*:
+        <select name="resource_subtype" required>
+            <option value="">— Выберите —</option>
+            <!-- Персонал -->
+            <option value="Приёмщик">Приёмщик</option>
+            <option value="Грузчик">Грузчик</option>
+            <option value="Контролёр">Контролёр</option>
+            <!-- Техника -->
+            <option value="Ричтрак">Ричтрак</option>
+            <option value="Паллетоперевозчик">Паллетоперевозчик</option>
+            <option value="Тележка">Тележка</option>
+        </select>
+    </label>
+
+    <label>Единица измерения*:
+        <select name="unit_type" required>
+            <option value="">— Выберите —</option>
+            <option value="шт">шт</option>
+            <option value="коробка">коробка</option>
+            <option value="паллета">паллета</option>
+        </select>
+    </label>
+
+    <label>Норма (ед./час)*:
+        <input type="number" step="0.01" name="norm_value" min="0.01" required>
+    </label>
+
+    <button type="submit">Сохранить</button>
+    <a href="{{ url_for('norm_list') }}" class="btn">Отмена</a>
+</form>
+{% endblock %}
