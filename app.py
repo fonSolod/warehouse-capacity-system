@@ -1478,4 +1478,5 @@ def recommendations_view():
 if __name__ == '__main__':
     print("🚀 Запуск приложения 'Информационная система оценки мощностей склада'...")
     print("Откройте в браузере: http://localhost:5001")
-    app.run(debug=True, host='127.0.0.1', port=5001)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=False)
