@@ -3,7 +3,6 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 import psycopg2
 from dotenv import load_dotenv
-# import pdfkit
 from datetime import datetime
 import csv
 from io import StringIO
@@ -32,7 +31,7 @@ def index():
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('SELECT name FROM clients LIMIT 5;')
-        clients = cur.fetchall()  # Получаем список кортежей: [('Клиент1',), ('Клиент2',), ...]
+        clients = cur.fetchall()
         cur.close()
         conn.close()
         return render_template('index.html', clients=clients)
@@ -40,7 +39,6 @@ def index():
         return f"<h1>❌ Ошибка подключения</h1><p>{str(e)}</p>"
 
 # === CRUD: Справочник клиентов ===
-
 @app.route('/clients')
 def client_list():
     """Просмотр списка клиентов"""
@@ -87,7 +85,6 @@ def client_edit(id):
     if not client:
         flash('Клиент не найден.', 'error')
         return redirect(url_for('client_list'))
-    
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         contact = request.form.get('contact_person', '').strip()
@@ -104,7 +101,6 @@ def client_edit(id):
                 return redirect(url_for('client_list'))
             except Exception as e:
                 flash(f'Ошибка при обновлении: {e}', 'error')
-    
     cur.close()
     conn.close()
     return render_template('clients/edit.html', client=client)
@@ -119,7 +115,6 @@ def client_delete(id):
     if not client:
         flash('Клиент не найден.', 'error')
         return redirect(url_for('client_list'))
-    
     if request.method == 'POST':
         try:
             cur.execute('DELETE FROM clients WHERE client_id = %s;', (id,))
@@ -128,7 +123,6 @@ def client_delete(id):
             return redirect(url_for('client_list'))
         except Exception as e:
             flash(f'Ошибка при удалении: {e}', 'error')
-    
     cur.close()
     conn.close()
     return render_template('clients/delete.html', client_name=client[0])
@@ -176,7 +170,6 @@ def warehouse_edit(id):
     if not wh:
         flash('Склад не найден.', 'error')
         return redirect(url_for('warehouse_list'))
-    
     if request.method == 'POST':
         name = request.form['name'].strip()
         address = request.form.get('address', '').strip()
@@ -191,7 +184,6 @@ def warehouse_edit(id):
             conn.commit()
             flash('Склад обновлён!', 'success')
             return redirect(url_for('warehouse_list'))
-    
     cur.close()
     conn.close()
     return render_template('warehouses/edit.html', warehouse=wh)
@@ -205,18 +197,15 @@ def warehouse_delete(id):
     if not wh:
         flash('Склад не найден.', 'error')
         return redirect(url_for('warehouse_list'))
-    
     if request.method == 'POST':
         cur.execute('DELETE FROM warehouses WHERE warehouse_id = %s;', (id,))
         conn.commit()
         flash(f'Склад "{wh[0]}" удалён.', 'success')
         return redirect(url_for('warehouse_list'))
-    
     cur.close()
     conn.close()
     return render_template('warehouses/delete.html', name=wh[0])
-    
-    
+
 # === CRUD: Справочник зон ===
 @app.route('/zones')
 def zone_list():
@@ -235,12 +224,10 @@ def zone_list():
 
 @app.route('/zones/create', methods=('GET', 'POST'))
 def zone_create():
-    # Получаем список складов для выпадающего списка
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT warehouse_id, name FROM warehouses ORDER BY name;')
     warehouses = cur.fetchall()
-    
     if request.method == 'POST':
         name = request.form['name'].strip()
         wh_id = request.form.get('warehouse_id')
@@ -259,7 +246,6 @@ def zone_create():
                 return redirect(url_for('zone_list'))
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-    
     cur.close()
     conn.close()
     return render_template('zones/create.html', warehouses=warehouses)
@@ -272,11 +258,9 @@ def zone_edit(id):
     zone = cur.fetchone()
     cur.execute('SELECT warehouse_id, name FROM warehouses ORDER BY name;')
     warehouses = cur.fetchall()
-    
     if not zone:
         flash('Зона не найдена.', 'error')
         return redirect(url_for('zone_list'))
-    
     if request.method == 'POST':
         name = request.form['name'].strip()
         wh_id = request.form.get('warehouse_id')
@@ -292,7 +276,6 @@ def zone_edit(id):
             conn.commit()
             flash('Зона обновлена!', 'success')
             return redirect(url_for('zone_list'))
-    
     cur.close()
     conn.close()
     return render_template('zones/edit.html', zone=zone, warehouses=warehouses)
@@ -306,18 +289,15 @@ def zone_delete(id):
     if not zone:
         flash('Зона не найдена.', 'error')
         return redirect(url_for('zone_list'))
-    
     if request.method == 'POST':
         cur.execute('DELETE FROM zones WHERE zone_id = %s;', (id,))
         conn.commit()
         flash(f'Зона "{zone[0]}" удалена.', 'success')
         return redirect(url_for('zone_list'))
-    
     cur.close()
     conn.close()
     return render_template('zones/delete.html', name=zone[0])
-    
-    
+
 # === CRUD: Справочник товаров ===
 @app.route('/products')
 def product_list():
@@ -343,14 +323,12 @@ def product_create():
     cur = conn.cursor()
     cur.execute('SELECT client_id, name FROM clients ORDER BY name;')
     clients = cur.fetchall()
-
     if request.method == 'POST':
         client_id = request.form.get('client_id')
         name = request.form.get('name', '').strip()
         weight = request.form.get('weight_per_unit')
         box = request.form.get('units_per_box')
         pallet = request.form.get('units_per_pallet')
-
         if not all([client_id, name, weight, box, pallet]):
             flash('Все поля обязательны!', 'error')
         else:
@@ -364,7 +342,6 @@ def product_create():
                 return redirect(url_for('product_list'))
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('products/create.html', clients=clients)
@@ -381,17 +358,14 @@ def product_edit(id):
     if not product:
         flash('Товар не найден.', 'error')
         return redirect(url_for('product_list'))
-
     cur.execute('SELECT client_id, name FROM clients ORDER BY name;')
     clients = cur.fetchall()
-
     if request.method == 'POST':
         client_id = request.form.get('client_id')
         name = request.form.get('name', '').strip()
         weight = request.form.get('weight_per_unit')
         box = request.form.get('units_per_box')
         pallet = request.form.get('units_per_pallet')
-
         if not all([client_id, name, weight, box, pallet]):
             flash('Все поля обязательны!', 'error')
         else:
@@ -407,7 +381,6 @@ def product_edit(id):
                 return redirect(url_for('product_list'))
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('products/edit.html', product=product, clients=clients)
@@ -421,28 +394,25 @@ def product_delete(id):
     if not prod:
         flash('Товар не найден.', 'error')
         return redirect(url_for('product_list'))
-    
     if request.method == 'POST':
         cur.execute('DELETE FROM products WHERE sku_id = %s;', (id,))
         conn.commit()
         flash(f'Товар "{prod[0]}" удалён.', 'success')
         return redirect(url_for('product_list'))
-    
     cur.close()
     conn.close()
     return render_template('products/delete.html', name=prod[0])
-    
-    
+
 # === CRUD: Справочник ресурсов ===
 @app.route('/resources')
 def resource_list():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        SELECT 
+        SELECT
             r.resource_id,
             r.name,
-            CASE 
+            CASE
                 WHEN r.type = 'staff' THEN 'Персонал'
                 WHEN r.type = 'equipment' THEN 'Техника'
                 ELSE r.type
@@ -465,7 +435,6 @@ def resource_create():
         r_type = request.form.get('type')
         subtype = request.form.get('subtype')
         zone_id = request.form.get('zone_id') or None
-
         if not (name and r_type and subtype):
             flash('Все поля обязательны!', 'error')
         else:
@@ -481,7 +450,6 @@ def resource_create():
                 return redirect(url_for('resource_list'))
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-    
     # Загружаем зоны для выпадающего списка
     conn = get_db_connection()
     cur = conn.cursor()
@@ -490,9 +458,7 @@ def resource_create():
     cur.close()
     conn.close()
     return render_template('resources/create.html', zones=zones)
-    
-    
-    
+
 @app.route('/resources/edit/<int:id>', methods=('GET', 'POST'))
 def resource_edit(id):
     conn = get_db_connection()
@@ -502,18 +468,15 @@ def resource_edit(id):
     if not res:
         flash('Ресурс не найден.', 'error')
         return redirect(url_for('resource_list'))
-
     cur.execute('SELECT zone_id, name FROM zones ORDER BY name;')
     zones = cur.fetchall()
     cur.close()
     conn.close()
-
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         r_type = request.form.get('type')
         subtype = request.form.get('subtype')
         zone_id = request.form.get('zone_id') or None
-
         if not (name and r_type and subtype):
             flash('Все поля обязательны!', 'error')
         else:
@@ -530,12 +493,7 @@ def resource_edit(id):
                 return redirect(url_for('resource_list'))
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-
     return render_template('resources/edit.html', resource=res, zones=zones)
-    
-    
-    
-    
 
 @app.route('/resources/delete/<int:id>', methods=('GET', 'POST'))
 def resource_delete(id):
@@ -546,21 +504,16 @@ def resource_delete(id):
     if not res:
         flash('Ресурс не найден.', 'error')
         return redirect(url_for('resource_list'))
-    
     if request.method == 'POST':
         cur.execute('DELETE FROM resources WHERE resource_id = %s;', (id,))
         conn.commit()
         flash(f'Ресурс "{res[0]}" удалён.', 'success')
         return redirect(url_for('resource_list'))
-    
     cur.close()
     conn.close()
     return render_template('resources/delete.html', name=res[0])
-    
-    
+
 # === Планы поступления ===
-
-
 @app.route('/inbound')
 def inbound_list():
     conn = get_db_connection()
@@ -575,8 +528,7 @@ def inbound_list():
     cur.close()
     conn.close()
     return render_template('inbound/list.html', docs=docs)
-    
-    
+
 @app.route('/inbound/create', methods=('GET', 'POST'))
 def inbound_create():
     conn = get_db_connection()
@@ -590,18 +542,14 @@ def inbound_create():
         skus = request.form.getlist('sku_id')
         qtys = request.form.getlist('qty')
         units = request.form.getlist('unit_type')
-
-
         if not (client_id and doc_number and doc_date):
             flash('Заполните реквизиты документа!', 'error')
         else:
-            # === Проверка: есть ли хотя бы одна валидная позиция ===
             valid_positions = 0
             for i in range(len(skus)):
                 sku_id = skus[i]
                 qty_str = qtys[i] if i < len(qtys) else ''
                 unit = units[i] if i < len(units) else 'шт'
-                # Пропускаем пустые или некорректные значения
                 if not sku_id or not qty_str.strip():
                     continue
                 try:
@@ -609,8 +557,7 @@ def inbound_create():
                     if qty_val > 0:
                         valid_positions += 1
                 except ValueError:
-                    continue  # игнорируем некорректные числа
-
+                    continue
             if valid_positions == 0:
                 flash('Добавьте хотя бы одну позицию с количеством > 0!', 'error')
             else:
@@ -624,7 +571,6 @@ def inbound_create():
                         sku_id = skus[i]
                         qty_str = qtys[i] if i < len(qtys) else ''
                         unit = units[i] if i < len(units) else 'шт'
-                        # Пропускаем пустые или некорректные значения
                         if not sku_id or not qty_str.strip():
                             continue
                         try:
@@ -635,7 +581,7 @@ def inbound_create():
                                     VALUES (%s, %s, %s, %s);
                                 ''', (doc_id, sku_id, qty_val, unit))
                         except ValueError:
-                            continue  # игнорируем некорректные числа
+                            continue
                     conn.commit()
                     flash('Поступление добавлено!', 'success')
                     return redirect(url_for('inbound_list'))
@@ -651,27 +597,21 @@ def inbound_create():
     conn.close()
     return render_template('inbound/create.html', clients=clients, products=products)
 
-
-    
 @app.route('/inbound/edit/<int:doc_id>', methods=('GET', 'POST'))
 def inbound_edit(doc_id):
     conn = get_db_connection()
     cur = conn.cursor()
-
-    # Проверяем, существует ли документ
     cur.execute('SELECT doc_id, client_id, doc_number, doc_date FROM inbound_documents WHERE doc_id = %s;', (doc_id,))
     doc = cur.fetchone()
     if not doc:
         flash('Документ не найден.', 'error')
         return redirect(url_for('inbound_list'))
-
     cur.execute('SELECT client_id, name FROM clients ORDER BY name;')
     clients = cur.fetchall()
     cur.execute('SELECT sku_id, name FROM products WHERE client_id = %s ORDER BY name;', (doc[1],))
     products = cur.fetchall()
     cur.execute('SELECT item_id, sku_id, qty, unit_type FROM inbound_items WHERE doc_id = %s;', (doc_id,))
     items = cur.fetchall()
-
     if request.method == 'POST':
         client_id = request.form.get('client_id')
         doc_number = request.form.get('doc_number', '').strip()
@@ -679,24 +619,18 @@ def inbound_edit(doc_id):
         skus = request.form.getlist('sku_id')
         qtys = request.form.getlist('qty')
         units = request.form.getlist('unit_type')
-
         if not (client_id and doc_number and doc_date):
             flash('Заполните реквизиты документа!', 'error')
         elif not any(qty.strip() and float(qty) > 0 for qty in qtys if qty):
             flash('Добавьте хотя бы одну позицию!', 'error')
         else:
             try:
-                # Обновляем заголовок
                 cur.execute('''
                     UPDATE inbound_documents
                     SET client_id = %s, doc_number = %s, doc_date = %s
                     WHERE doc_id = %s;
                 ''', (client_id, doc_number, doc_date, doc_id))
-
-                # Удаляем старые позиции
                 cur.execute('DELETE FROM inbound_items WHERE doc_id = %s;', (doc_id,))
-
-                # Добавляем новые
                 for i in range(len(skus)):
                     sku_id = skus[i]
                     qty = qtys[i]
@@ -706,19 +640,16 @@ def inbound_edit(doc_id):
                             INSERT INTO inbound_items (doc_id, sku_id, qty, unit_type)
                             VALUES (%s, %s, %s, %s);
                         ''', (doc_id, sku_id, qty, unit))
-
                 conn.commit()
                 flash('Поступление обновлено!', 'success')
                 return redirect(url_for('inbound_list'))
             except Exception as e:
                 conn.rollback()
                 flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('inbound/edit.html', doc=doc, clients=clients, products=products, items=items)
-    
-    
+
 @app.route('/inbound/delete/<int:doc_id>', methods=('GET', 'POST'))
 def inbound_delete(doc_id):
     conn = get_db_connection()
@@ -728,21 +659,17 @@ def inbound_delete(doc_id):
     if not doc:
         flash('Документ не найден.', 'error')
         return redirect(url_for('inbound_list'))
-
     if request.method == 'POST':
         try:
-            # Каскадное удаление через FOREIGN KEY (ON DELETE CASCADE)
             cur.execute('DELETE FROM inbound_documents WHERE doc_id = %s;', (doc_id,))
             conn.commit()
             flash(f'Документ {doc[0]} удалён.', 'success')
             return redirect(url_for('inbound_list'))
         except Exception as e:
             flash(f'Ошибка при удалении: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('inbound/delete.html', doc_number=doc[0])
-
 
 @app.route('/inbound/validate/<int:doc_id>', methods=('GET', 'POST'))
 def inbound_validate(doc_id):
@@ -758,7 +685,6 @@ def inbound_validate(doc_id):
     if not doc:
         flash('Документ не найден.', 'error')
         return redirect(url_for('inbound_list'))
-
     if request.method == 'POST':
         try:
             cur.execute('UPDATE inbound_documents SET validated = TRUE WHERE doc_id = %s;', (doc_id,))
@@ -767,15 +693,10 @@ def inbound_validate(doc_id):
             return redirect(url_for('inbound_list'))
         except Exception as e:
             flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('inbound/validate.html', doc_number=doc[0], client_name=doc[1])
 
-
-
-    
-    
 # === Планы отгрузки ===
 @app.route('/plans/outbound')
 def outbound_list():
@@ -801,7 +722,6 @@ def outbound_create():
     clients = cur.fetchall()
     cur.execute('SELECT sku_id, name, client_id FROM products ORDER BY name;')
     products = cur.fetchall()
-    
     if request.method == 'POST':
         client_id = request.form.get('client_id')
         sku_id = request.form.get('sku_id')
@@ -820,37 +740,30 @@ def outbound_create():
                 return redirect(url_for('outbound_list'))
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-    
     cur.close()
     conn.close()
     return render_template('plans/outbound_create.html', clients=clients, products=products)
 
-
-# === Расчёт потребности (A9) — обновлённая версия ===
+# === Расчёт потребности (A9) ===
 @app.route('/requirements', methods=('GET', 'POST'))
 def requirements_view():
     """Просмотр рассчитанной потребности в ресурсах с фильтром по дате"""
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
-
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-
-        # Запрос к обновлённому VIEW
         query = '''
-            SELECT 
+            SELECT
                 r.date,
                 r.doc_number,
                 z.name AS zone_name,
-                r.resource_type,  -- уже содержит подтип на русском (Приёмщик, Ричтрак и т.д.)
+                r.resource_type,
                 ROUND(r.required_units, 2) AS required_units
             FROM v_resource_requirements r
             JOIN zones z ON r.zone_id = z.zone_id
         '''
         params = []
-
-        # Фильтрация по дате
         if start_date and end_date:
             query += ' WHERE r.date BETWEEN %s AND %s'
             params = [start_date, end_date]
@@ -860,14 +773,11 @@ def requirements_view():
         elif end_date:
             query += ' WHERE r.date <= %s'
             params = [end_date]
-
         query += ' ORDER BY r.date, r.doc_number, z.name;'
-
         cur.execute(query, params)
         requirements = cur.fetchall()
         cur.close()
         conn.close()
-
         return render_template(
             'requirements/list.html',
             requirements=requirements,
@@ -884,13 +794,13 @@ def norm_list():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        SELECT 
+        SELECT
             n.norm_id,
             c.name AS client_name,
             p.name AS sku_name,
             n.operation_type,
             n.zone_type,
-            n.resource_subtype,  -- ✅ Используем subtype
+            n.resource_subtype,
             n.unit_type,
             n.norm_value
         FROM norms n
@@ -902,8 +812,6 @@ def norm_list():
     cur.close()
     conn.close()
     return render_template('norms/list.html', norms=norms)
-
-
 
 @app.route('/norms/create', methods=('GET', 'POST'))
 def norm_create():
@@ -918,10 +826,9 @@ def norm_create():
         sku_id = request.form.get('sku_id')
         op_type = request.form.get('operation_type')
         zone_type = request.form.get('zone_type')
-        resource_subtype = request.form.get('resource_subtype')  # ✅ Правильное имя
+        resource_subtype = request.form.get('resource_subtype')
         unit_type = request.form.get('unit_type')
         norm_val = request.form.get('norm_value')
-
         if not all([client_id, sku_id, op_type, zone_type, resource_subtype, unit_type, norm_val]):
             flash('Все поля обязательны!', 'error')
         else:
@@ -941,12 +848,10 @@ def norm_create():
             except Exception as e:
                 conn.rollback()
                 flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('norms/create.html', clients=clients, products=products)
-    
-    
+
 @app.route('/norms/edit/<int:id>', methods=('GET', 'POST'))
 def norm_edit(id):
     conn = get_db_connection()
@@ -960,12 +865,10 @@ def norm_edit(id):
     if not norm:
         flash('Норматив не найден.', 'error')
         return redirect(url_for('norm_list'))
-
     cur.execute('SELECT client_id, name FROM clients ORDER BY name;')
     clients = cur.fetchall()
     cur.execute('SELECT sku_id, name FROM products ORDER BY name;')
     products = cur.fetchall()
-
     if request.method == 'POST':
         client_id = request.form.get('client_id')
         sku_id = request.form.get('sku_id')
@@ -974,7 +877,6 @@ def norm_edit(id):
         resource_subtype = request.form.get('resource_subtype')
         unit_type = request.form.get('unit_type')
         norm_val = request.form.get('norm_value')
-
         if not all([client_id, sku_id, op_type, zone_type, resource_subtype, unit_type, norm_val]):
             flash('Все поля обязательны!', 'error')
         else:
@@ -994,7 +896,6 @@ def norm_edit(id):
             except Exception as e:
                 conn.rollback()
                 flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('norms/edit.html', norm=norm, clients=clients, products=products)
@@ -1008,27 +909,25 @@ def norm_delete(id):
     if not norm:
         flash('Норматив не найден.', 'error')
         return redirect(url_for('norm_list'))
-    
     if request.method == 'POST':
         cur.execute('DELETE FROM norms WHERE norm_id = %s;', (id,))
         conn.commit()
         flash('Норматив удалён.', 'success')
         return redirect(url_for('norm_list'))
-    
     cur.close()
     conn.close()
     op_desc = f"{norm[0]} / {norm[1]} / {norm[2]}"
     return render_template('norms/delete.html', description=op_desc)
-    
+
 @app.route('/capacities')
 def capacity_list():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        SELECT 
+        SELECT
             ac.capacity_id,
             r.name AS resource_name,
-            r.subtype,  
+            r.subtype,
             ac.date,
             ac.available_hours
         FROM available_capacities ac
@@ -1039,19 +938,17 @@ def capacity_list():
     cur.close()
     conn.close()
     return render_template('capacities/list.html', capacities=capacities)
-    
+
 @app.route('/capacities/create', methods=('GET', 'POST'))
 def capacity_create():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT resource_id, name, subtype FROM resources ORDER BY name;')
     resources = cur.fetchall()
-
     if request.method == 'POST':
         resource_id = request.form.get('resource_id')
         date = request.form.get('date')
         hours = request.form.get('available_hours')
-
         if not (resource_id and date and hours):
             flash('Все поля обязательны!', 'error')
         else:
@@ -1067,18 +964,14 @@ def capacity_create():
                 flash('Для этого ресурса на эту дату уже задана доступность!', 'error')
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('capacities/create.html', resources=resources)
-    
-    
+
 @app.route('/capacities/edit/<int:id>', methods=('GET', 'POST'))
 def capacity_edit(id):
     conn = get_db_connection()
     cur = conn.cursor()
-    
-    # Получаем текущую запись
     cur.execute('''
         SELECT capacity_id, resource_id, date, available_hours
         FROM available_capacities
@@ -1088,16 +981,12 @@ def capacity_edit(id):
     if not capacity:
         flash('Запись не найдена.', 'error')
         return redirect(url_for('capacity_list'))
-
-    # Загружаем список ресурсов для выпадающего списка
     cur.execute('SELECT resource_id, name, subtype FROM resources ORDER BY name;')
     resources = cur.fetchall()
-
     if request.method == 'POST':
         resource_id = request.form.get('resource_id')
         date = request.form.get('date')
         hours = request.form.get('available_hours')
-
         if not (resource_id and date and hours):
             flash('Все поля обязательны!', 'error')
         else:
@@ -1114,19 +1003,14 @@ def capacity_edit(id):
                 flash('Для этого ресурса на эту дату уже задана доступность!', 'error')
             except Exception as e:
                 flash(f'Ошибка: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('capacities/edit.html', capacity=capacity, resources=resources)
-    
-    
-    
+
 @app.route('/capacities/delete/<int:id>', methods=('GET', 'POST'))
 def capacity_delete(id):
     conn = get_db_connection()
     cur = conn.cursor()
-    
-    # Получаем данные для подтверждения
     cur.execute('''
         SELECT ac.date, r.name AS resource_name
         FROM available_capacities ac
@@ -1137,7 +1021,6 @@ def capacity_delete(id):
     if not capacity:
         flash('Запись не найдена.', 'error')
         return redirect(url_for('capacity_list'))
-
     if request.method == 'POST':
         try:
             cur.execute('DELETE FROM available_capacities WHERE capacity_id = %s;', (id,))
@@ -1146,25 +1029,20 @@ def capacity_delete(id):
             return redirect(url_for('capacity_list'))
         except Exception as e:
             flash(f'Ошибка при удалении: {e}', 'error')
-
     cur.close()
     conn.close()
     return render_template('capacities/delete.html', date=capacity[0], resource_name=capacity[1])
-
 
 @app.route('/balance', methods=('GET', 'POST'))
 def balance_view():
     """Просмотр баланса мощностей (A12) с фильтром по дате"""
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
-
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-
-        # Базовый запрос
         query = '''
-            SELECT 
+            SELECT
                 date,
                 zone_name,
                 resource_subtype,
@@ -1174,8 +1052,6 @@ def balance_view():
             FROM v_capacity_balance
         '''
         params = []
-
-        # Фильтр по дате
         if start_date and end_date:
             query += ' WHERE date BETWEEN %s AND %s'
             params = [start_date, end_date]
@@ -1185,9 +1061,7 @@ def balance_view():
         elif end_date:
             query += ' WHERE date <= %s'
             params = [end_date]
-
         query += ' ORDER BY date, zone_name, resource_subtype;'
-
         cur.execute(query, params)
         balance_data = cur.fetchall()
         cur.close()
@@ -1202,7 +1076,6 @@ def balance_view():
         flash(f'Ошибка при загрузке баланса: {e}', 'error')
         return redirect(url_for('index'))
 
-
 # === Страница выбора отчёта ===
 @app.route('/reports')
 def report_select():
@@ -1214,13 +1087,12 @@ def generate_report():
     report_type = request.form.get('report_type')
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
-    action = request.form.get('action')  # 'preview', 'pdf', 'csv'
+    action = request.form.get('action')  # 'preview' или 'csv'
 
     if not (report_type and start_date and end_date):
         flash('Выберите тип отчёта и укажите период!', 'error')
         return redirect(url_for('report_select'))
 
-    # Заголовок отчёта
     titles = {
         'balance': 'Отчёт по балансу мощностей',
         'load': 'Отчёт нагрузка за период',
@@ -1229,13 +1101,11 @@ def generate_report():
     }
     title = titles.get(report_type, 'Отчёт')
 
-    # Получение данных
     data = []
     headers = []
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-
         if report_type == 'balance':
             cur.execute('''
                 SELECT date, zone_name, resource_subtype, required_hours, available_hours, balance
@@ -1244,10 +1114,8 @@ def generate_report():
                 ORDER BY date, zone_name, resource_subtype;
             ''', (start_date, end_date))
             raw_data = cur.fetchall()
-            # Округляем числовые поля до 2 знаков
             data = [(row[0], row[1], row[2], round(row[3], 2), round(row[4], 2), round(row[5], 2)) for row in raw_data]
             headers = ['Дата', 'Зона', 'Ресурс', 'Требуемо, ч', 'Доступно, ч', 'Баланс, ч']
-
         elif report_type == 'load':
             cur.execute('''
                 SELECT d.doc_date, d.doc_number, c.name, p.name, i.qty, i.unit_type
@@ -1259,10 +1127,8 @@ def generate_report():
                 ORDER BY d.doc_date, d.doc_number;
             ''', (start_date, end_date))
             raw_data = cur.fetchall()
-            # qty — может быть дробным
             data = [(row[0], row[1], row[2], row[3], round(row[4], 2), row[5]) for row in raw_data]
             headers = ['Дата', 'Документ', 'Клиент', 'Товар', 'Кол-во', 'Ед.изм.']
-
         elif report_type == 'requirement':
             cur.execute('''
                 SELECT date, doc_number, zone_name, resource_type, required_units
@@ -1274,7 +1140,6 @@ def generate_report():
             raw_data = cur.fetchall()
             data = [(row[0], row[1], row[2], row[3], round(row[4], 2)) for row in raw_data]
             headers = ['Дата', 'Документ', 'Зона', 'Ресурс', 'Требуемо, ед.']
-
         elif report_type == 'capacity':
             cur.execute('''
                 SELECT ac.date, r.name, r.subtype, ac.available_hours
@@ -1286,36 +1151,14 @@ def generate_report():
             raw_data = cur.fetchall()
             data = [(row[0], row[1], row[2], round(row[3], 2)) for row in raw_data]
             headers = ['Дата', 'Ресурс', 'Подтип', 'Доступно, ч']
-
         cur.close()
         conn.close()
-
     except Exception as e:
         flash(f'Ошибка при формировании отчёта: {e}', 'error')
         return redirect(url_for('report_select'))
 
-
-"""
     # === Обработка действий ===
-    if action == 'pdf':
-        html = render_template('reports/pdf_template.html', title=title, headers=headers, data=data, start_date=start_date, end_date=end_date)
-        options = {
-            'page-size': 'A4',
-            'margin-top': '0.75in',
-            'margin-right': '0.75in',
-            'margin-bottom': '0.75in',
-            'margin-left': '0.75in',
-            'encoding': "UTF-8",
-            'no-outline': None
-        }
-        pdf = pdfkit.from_string(html, False, options=options)
-        response = make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'inline; filename=report_{report_type}_{start_date}_{end_date}.pdf'
-        return response
-
-    elif action == 'csv':
-        # Генерация CSV
+    if action == 'csv':
         output = StringIO()
         writer = csv.writer(output, delimiter=';', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(headers)
@@ -1326,42 +1169,31 @@ def generate_report():
         response.headers['Content-Type'] = 'text/csv; charset=utf-8-sig'
         response.headers['Content-Disposition'] = f'attachment; filename=report_{report_type}_{start_date}_{end_date}.csv'
         return response
-
     else:  # preview
         return render_template('reports/preview.html', title=title, headers=headers, data=data, start_date=start_date, end_date=end_date)
 
-"""
-
 def generate_recommendations_from_balance(balance_data):
-    """
-    Генерирует рекомендации на основе баланса.
-    balance_data: список кортежей (date, zone_name, resource_subtype, required, available, balance)
-    """
     recommendations = []
     for row in balance_data:
         date, zone, resource, required, available, balance = row
         balance = float(balance)
         rec_text = ""
-
-        # Определяем тип ресурса
         is_staff = any(t in resource for t in ['Приёмщик', 'Грузчик', 'Контролёр'])
         is_equipment = any(t in resource for t in ['Ричтрак', 'Паллетоперевозчик', 'Тележка'])
-
-        if balance < -2.0:  # Сильный дефицит
+        if balance < -2.0:
             if is_staff:
                 rec_text = "Назначить дополнительного сотрудника на смену"
             elif is_equipment:
                 rec_text = "Рассмотреть аренду дополнительной техники на пиковые дни"
-        elif balance < 0:   # Умеренный дефицит
+        elif balance < 0:
             if is_staff:
                 rec_text = "Привлечь сверхурочные часы для текущего сотрудника"
             elif is_equipment:
                 rec_text = "Проверить график ТО — возможно, техника простаивает"
-        elif balance > 3.0: # Избыток
+        elif balance > 3.0:
             rec_text = "Переназначить ресурс на другую зону или сократить смену"
         else:
-            continue  # в балансе — не показываем
-
+            continue
         recommendations.append({
             'date': date,
             'zone': zone,
@@ -1371,12 +1203,9 @@ def generate_recommendations_from_balance(balance_data):
             'type': 'Дефицит' if balance < 0 else 'Избыток'
         })
     return recommendations
-    
-    
+
 @app.route('/recommendations', methods=['GET', 'POST'])
 def recommendations_view():
-    """Просмотр рекомендаций по корректировке ресурсов (A14) с фильтром и экспортами"""
-    # Определяем источник дат: POST (при отправке формы) или GET (при первом заходе)
     if request.method == 'POST':
         start_date = request.form.get('start_date')
         end_date = request.form.get('end_date')
@@ -1389,17 +1218,14 @@ def recommendations_view():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-
-        # Запрос к балансу с фильтром по дате
         query = '''
-            SELECT 
+            SELECT
                 date, zone_name, resource_subtype,
                 required_hours, available_hours, balance
             FROM v_capacity_balance
             WHERE balance != 0
         '''
         params = []
-
         if start_date and end_date:
             query += ' AND date BETWEEN %s AND %s'
             params = [start_date, end_date]
@@ -1409,22 +1235,44 @@ def recommendations_view():
         elif end_date:
             query += ' AND date <= %s'
             params = [end_date]
-
         query += ' ORDER BY date, zone_name, resource_subtype;'
         cur.execute(query, params)
         balance_data = cur.fetchall()
         cur.close()
         conn.close()
-
-        # Генерация рекомендаций
         recommendations = generate_recommendations_from_balance(balance_data)
 
-# 11-38
+        if action == 'csv':
+            output = StringIO()
+            writer = csv.writer(output, delimiter=';', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(['Дата', 'Зона', 'Ресурс', 'Баланс, ч', 'Тип', 'Рекомендация'])
+            for rec in recommendations:
+                writer.writerow([
+                    rec['date'],
+                    rec['zone'],
+                    rec['resource'],
+                    rec['balance'],
+                    rec['type'],
+                    rec['recommendation']
+                ])
+            output.seek(0)
+            response = make_response(output.getvalue())
+            response.headers['Content-Type'] = 'text/csv; charset=utf-8-sig'
+            response.headers['Content-Disposition'] = f'attachment; filename=recommendations_{start_date or "all"}_{end_date or "all"}.csv'
+            return response
+        else:
+            return render_template(
+                'recommendations/list.html',
+                recommendations=recommendations,
+                start_date=start_date,
+                end_date=end_date
+            )
+    except Exception as e:
+        flash(f'Ошибка при загрузке рекомендаций: {e}', 'error')
+        return redirect(url_for('index'))
+
 # === Запуск приложения ===
 if __name__ == '__main__':
     print("🚀 Запуск приложения 'Информационная система оценки мощностей склада'...")
-    print("Откройте в браузере: http://localhost:5001")
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=False)
-
-
