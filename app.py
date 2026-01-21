@@ -1418,65 +1418,12 @@ def recommendations_view():
 
         # Генерация рекомендаций
         recommendations = generate_recommendations_from_balance(balance_data)
-"""
-        # === Обработка экспорта ===
-        if action == 'pdf':
-            html = render_template(
-                'recommendations/pdf_template.html',
-                recommendations=recommendations,
-                start_date=start_date,
-                end_date=end_date
-            )
-            options = {
-                'page-size': 'A4',
-                'margin-top': '0.75in',
-                'margin-right': '0.75in',
-                'margin-bottom': '0.75in',
-                'margin-left': '0.75in',
-                'encoding': "UTF-8",
-                'no-outline': None
-            }
-            pdf = pdfkit.from_string(html, False, options=options)
-            response = make_response(pdf)
-            response.headers['Content-Type'] = 'application/pdf'
-            response.headers['Content-Disposition'] = f'inline; filename=recommendations_{start_date or "all"}_{end_date or "all"}.pdf'
-            return response
 
-        elif action == 'csv':
-            output = StringIO()
-            writer = csv.writer(output, delimiter=';', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(['Дата', 'Зона', 'Ресурс', 'Баланс, ч', 'Тип', 'Рекомендация'])
-            for rec in recommendations:
-                writer.writerow([
-                    rec['date'],
-                    rec['zone'],
-                    rec['resource'],
-                    rec['balance'],
-                    rec['type'],
-                    rec['recommendation']
-                ])
-            output.seek(0)
-            response = make_response(output.getvalue())
-            response.headers['Content-Type'] = 'text/csv; charset=utf-8-sig'
-            response.headers['Content-Disposition'] = f'attachment; filename=recommendations_{start_date or "all"}_{end_date or "all"}.csv'
-            return response
 
-        else:
-            # Показываем форму с результатами (в list.html)
-            return render_template(
-                'recommendations/list.html',  # ← ВАЖНО: list.html, а не preview.html
-                recommendations=recommendations,
-                start_date=start_date,
-                end_date=end_date
-            )
-
-    except Exception as e:
-        flash(f'Ошибка при загрузке рекомендаций: {e}', 'error')
-        return redirect(url_for('index'))
-"""
 # === Запуск приложения ===
 if __name__ == '__main__':
     print("🚀 Запуск приложения 'Информационная система оценки мощностей склада'...")
     print("Откройте в браузере: http://localhost:5001")
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=False)
+
