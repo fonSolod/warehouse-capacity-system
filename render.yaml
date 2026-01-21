@@ -1,5 +1,0 @@
-services:
-  - type: web
-    name: warehouse-capacity-system
-    env: python
-    python_version: "3.12"
