@@ -1419,11 +1419,12 @@ def recommendations_view():
         # Генерация рекомендаций
         recommendations = generate_recommendations_from_balance(balance_data)
 
-
+# 11-38
 # === Запуск приложения ===
 if __name__ == '__main__':
     print("🚀 Запуск приложения 'Информационная система оценки мощностей склада'...")
     print("Откройте в браузере: http://localhost:5001")
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=False)
+
 
